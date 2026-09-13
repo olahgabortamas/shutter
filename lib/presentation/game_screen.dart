@@ -27,7 +27,8 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late final Future<List<ShutterLevel>> _campaign =
       widget.repository.loadCampaign();
-  late final GamePreferences _preferences = widget.preferences ?? GamePreferences();
+  late final GamePreferences _preferences =
+      widget.preferences ?? GamePreferences();
 
   @override
   void dispose() {
@@ -44,7 +45,9 @@ class _GameScreenState extends State<GameScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) return _LoadError(error: snapshot.error);
           if (!snapshot.hasData) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator(strokeWidth: 1.5)));
+            return const Scaffold(
+                body:
+                    Center(child: CircularProgressIndicator(strokeWidth: 1.5)));
           }
           final levels = snapshot.requireData;
           if (levels.isEmpty) {
@@ -67,8 +70,8 @@ class _CampaignGame extends StatefulWidget {
 }
 
 class _CampaignGameState extends State<_CampaignGame> {
-  late int _levelIndex = widget.preferences.currentLevelIndex
-      .clamp(0, widget.levels.length - 1);
+  late int _levelIndex =
+      widget.preferences.currentLevelIndex.clamp(0, widget.levels.length - 1);
 
   void _advance() {
     setState(() {
@@ -143,7 +146,8 @@ class _LoadedGameState extends State<_LoadedGame> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: ShutterColors.surfaceLight,
-        title: const Text('PAUSED', style: TextStyle(letterSpacing: 3, fontSize: 13)),
+        title: const Text('PAUSED',
+            style: TextStyle(letterSpacing: 3, fontSize: 13)),
         content: const Text('Take your time. The mechanism will wait.'),
         actions: [
           TextButton(
@@ -186,8 +190,14 @@ class _LoadedGameState extends State<_LoadedGame> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _TopButton(icon: Icons.pause_rounded, label: 'Pause', onPressed: _openPause),
-                        _TopButton(icon: Icons.tune_rounded, label: 'Settings', onPressed: _openSettings),
+                        _TopButton(
+                            icon: Icons.pause_rounded,
+                            label: 'Pause',
+                            onPressed: _openPause),
+                        _TopButton(
+                            icon: Icons.tune_rounded,
+                            label: 'Settings',
+                            onPressed: _openSettings),
                       ],
                     ),
                   ),
@@ -206,34 +216,47 @@ class _LoadedGameState extends State<_LoadedGame> {
                   const SizedBox(height: 3),
                   const Text(
                     'SLIDE  •  MASK  •  REVEAL',
-                    style: TextStyle(fontSize: 9, letterSpacing: 2.5, color: ShutterColors.muted),
+                    style: TextStyle(
+                        fontSize: 9,
+                        letterSpacing: 2.5,
+                        color: ShutterColors.muted),
                   ),
                   SizedBox(height: compact ? 10 : 18),
                   Text(
                     'LEVEL ${widget.level.number.toString().padLeft(2, '0')}',
-                    style: const TextStyle(fontSize: 12, letterSpacing: 3.5, color: ShutterColors.text),
+                    style: const TextStyle(
+                        fontSize: 12,
+                        letterSpacing: 3.5,
+                        color: ShutterColors.text),
                   ),
                   const SizedBox(height: 10),
-                  TargetPreview(level: widget.level, confirmed: controller.solved),
+                  TargetPreview(
+                      level: widget.level, confirmed: controller.solved),
                   const SizedBox(height: 7),
                   AnimatedSwitcher(
-                    duration: widget.preferences.reducedMotion ? Duration.zero : const Duration(milliseconds: 300),
+                    duration: widget.preferences.reducedMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 300),
                     child: Text(
                       controller.solved
                           ? 'COMPLETE'
                           : controller.hasMoved || widget.level.number != 1
-                          ? 'TARGET'
-                          : 'REVEAL THIS PATTERN',
+                              ? 'TARGET'
+                              : 'REVEAL THIS PATTERN',
                       key: ValueKey((controller.solved, controller.hasMoved)),
                       style: TextStyle(
                         fontSize: 9,
                         letterSpacing: 3,
-                        color: controller.solved ? ShutterColors.brassDark : ShutterColors.muted,
+                        color: controller.solved
+                            ? ShutterColors.brassDark
+                            : ShutterColors.muted,
                       ),
                     ),
                   ),
                   AnimatedSize(
-                    duration: widget.preferences.reducedMotion ? Duration.zero : const Duration(milliseconds: 260),
+                    duration: widget.preferences.reducedMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 260),
                     curve: Curves.easeOutCubic,
                     child: widget.level.number == 1 && !controller.hasMoved
                         ? const _FirstMoveGuide()
@@ -260,7 +283,9 @@ class _LoadedGameState extends State<_LoadedGame> {
                   ),
                   const SizedBox(height: 14),
                   AnimatedSwitcher(
-                    duration: widget.preferences.reducedMotion ? Duration.zero : const Duration(milliseconds: 450),
+                    duration: widget.preferences.reducedMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 450),
                     switchInCurve: Curves.easeOutCubic,
                     child: controller.solved
                         ? _AdvanceButton(
@@ -292,7 +317,8 @@ class _FirstMoveGuide extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Semantics(
-        label: 'How to play: slide both shutters. A lamp appears only where both apertures align. Match the target pattern.',
+        label:
+            'How to play: slide both shutters. A lamp appears only where both apertures align. Match the target pattern.',
         child: Container(
           width: 286,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -304,7 +330,7 @@ class _FirstMoveGuide extends StatelessWidget {
           child: const Column(
             children: [
               Text(
-                'SLIDE BOTH SHUTTERS',
+                'MOVE THE TWO PLATES',
                 style: TextStyle(
                   color: ShutterColors.text,
                   fontSize: 10,
@@ -314,7 +340,7 @@ class _FirstMoveGuide extends StatelessWidget {
               ),
               SizedBox(height: 7),
               Text(
-                'A lamp appears only where both apertures align.\nMatch the target pattern above.',
+                'Drag the round handles along their rails.\nA lamp shines only through openings in both plates.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: ShutterColors.muted,
@@ -369,7 +395,8 @@ class _AdvanceButton extends StatelessWidget {
 }
 
 class _TopButton extends StatelessWidget {
-  const _TopButton({required this.icon, required this.label, required this.onPressed});
+  const _TopButton(
+      {required this.icon, required this.label, required this.onPressed});
   final IconData icon;
   final String label;
   final VoidCallback onPressed;
@@ -400,7 +427,8 @@ class _LoadError extends StatelessWidget {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
-          child: Text('The mechanism could not be loaded.\n$error', textAlign: TextAlign.center),
+          child: Text('The mechanism could not be loaded.\n$error',
+              textAlign: TextAlign.center),
         ),
       ),
     );

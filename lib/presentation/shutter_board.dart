@@ -21,7 +21,8 @@ class ShutterBoard extends StatefulWidget {
   State<ShutterBoard> createState() => _ShutterBoardState();
 }
 
-class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderStateMixin {
+class _ShutterBoardState extends State<ShutterBoard>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _snapController;
   late List<double> _visualNotches;
   int? _draggedPlate;
@@ -34,7 +35,8 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _visualNotches = widget.controller.positions.map((value) => value.toDouble()).toList();
+    _visualNotches =
+        widget.controller.positions.map((value) => value.toDouble()).toList();
     _snapController = AnimationController(vsync: this, duration: _snapDuration)
       ..addListener(() {
         final index = _snappingPlate;
@@ -73,7 +75,8 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
   void _syncFromController() {
     if (_draggedPlate != null || _snapController.isAnimating) return;
     setState(() {
-      _visualNotches = widget.controller.positions.map((value) => value.toDouble()).toList();
+      _visualNotches =
+          widget.controller.positions.map((value) => value.toDouble()).toList();
     });
   }
 
@@ -89,7 +92,8 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
     final dx = (point.dx - center.dx).abs();
     final dy = (point.dy - center.dy).abs();
     final preferredAxis = dx > dy ? PlateAxis.horizontal : PlateAxis.vertical;
-    final preferred = widget.controller.level.plates.indexWhere((p) => p.axis == preferredAxis);
+    final preferred = widget.controller.level.plates
+        .indexWhere((p) => p.axis == preferredAxis);
     return preferred >= 0 ? preferred : 0;
   }
 
@@ -109,12 +113,14 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
     final index = _draggedPlate;
     if (index == null) return;
     final plate = widget.controller.level.plates[index];
-    final delta = plate.axis == PlateAxis.horizontal ? details.delta.dx : details.delta.dy;
+    final delta = plate.axis == PlateAxis.horizontal
+        ? details.delta.dx
+        : details.delta.dy;
     _dragDistance += delta;
     final notchSpacing = size.shortestSide * .13;
     setState(() {
-      _visualNotches[index] =
-          (_dragStartNotch + _dragDistance / notchSpacing).clamp(0, plate.notchCount - 1);
+      _visualNotches[index] = (_dragStartNotch + _dragDistance / notchSpacing)
+          .clamp(0, plate.notchCount - 1);
     });
   }
 
@@ -143,9 +149,11 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       final size = Size(constraints.maxWidth, constraints.maxHeight);
-      final roundedPositions = _visualNotches.map((value) => value.round()).toList(growable: false);
+      final roundedPositions =
+          _visualNotches.map((value) => value.round()).toList(growable: false);
       return Semantics(
-        label: 'Shutter mechanism. Drag horizontally or vertically to move a plate.',
+        label:
+            'Shutter mechanism. Drag horizontally or vertically to move a plate.',
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanStart: (details) => _start(details, size),
@@ -155,7 +163,8 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
             painter: ShutterBoardPainter(
               level: widget.controller.level,
               visualNotches: _visualNotches,
-              visibleLights: widget.controller.level.visibleLights(roundedPositions),
+              visibleLights:
+                  widget.controller.level.visibleLights(roundedPositions),
               draggedPlate: _draggedPlate,
               hint: widget.controller.hint,
               solved: widget.controller.solved,
@@ -187,7 +196,8 @@ class ShutterBoardPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final outer = Offset.zero & size;
-    final frame = RRect.fromRectAndRadius(outer.deflate(size.width * .015), Radius.circular(size.width * .075));
+    final frame = RRect.fromRectAndRadius(
+        outer.deflate(size.width * .015), Radius.circular(size.width * .075));
     canvas.drawShadow(
       Path()..addRRect(frame),
       Colors.black.withValues(alpha: .22),
@@ -196,11 +206,16 @@ class ShutterBoardPainter extends CustomPainter {
     );
     canvas.drawRRect(
       frame,
-      Paint()..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [ShutterColors.surfaceLight, ShutterColors.surface, Color(0xFFD8D2C7)],
-      ).createShader(outer),
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            ShutterColors.surfaceLight,
+            ShutterColors.surface,
+            Color(0xFFD8D2C7)
+          ],
+        ).createShader(outer),
     );
 
     final rimRect = outer.deflate(size.width * .065);
@@ -211,13 +226,15 @@ class ShutterBoardPainter extends CustomPainter {
     final cavity = rimRect.deflate(size.width * .012);
     canvas.drawRRect(
       RRect.fromRectAndRadius(cavity, Radius.circular(size.width * .037)),
-      Paint()..shader = const RadialGradient(
-        colors: [ShutterColors.cavityLight, ShutterColors.cavity],
-        radius: .95,
-      ).createShader(cavity),
+      Paint()
+        ..shader = const RadialGradient(
+          colors: [ShutterColors.cavityLight, ShutterColors.cavity],
+          radius: .95,
+        ).createShader(cavity),
     );
 
     _drawLamps(canvas, cavity);
+    _drawRailGuides(canvas, cavity);
     for (var index = level.plates.length - 1; index >= 0; index--) {
       _drawPlate(canvas, cavity, index);
     }
@@ -230,27 +247,82 @@ class ShutterBoardPainter extends CustomPainter {
     for (var row = 0; row < level.rows; row++) {
       for (var column = 0; column < level.columns; column++) {
         final index = row * level.columns + column;
-        final center = Offset(cavity.left + (column + .5) * cellW, cavity.top + (row + .5) * cellH);
+        final center = Offset(cavity.left + (column + .5) * cellW,
+            cavity.top + (row + .5) * cellH);
         final radius = math.min(cellW, cellH) * .09;
         if (visibleLights[index]) {
           canvas.drawCircle(
             center,
             radius * 3,
-            Paint()..shader = RadialGradient(colors: [
-              ShutterColors.lightOn.withValues(alpha: solved ? .28 : .2),
-              Colors.transparent,
-            ]).createShader(Rect.fromCircle(center: center, radius: radius * 3)),
+            Paint()
+              ..shader = RadialGradient(colors: [
+                ShutterColors.lightOn.withValues(alpha: solved ? .28 : .2),
+                Colors.transparent,
+              ]).createShader(
+                  Rect.fromCircle(center: center, radius: radius * 3)),
           );
-          canvas.drawCircle(center, radius, Paint()..color = ShutterColors.lightOn);
-          canvas.drawCircle(center.translate(-radius * .18, -radius * .18), radius * .34, Paint()..color = ShutterColors.lightCore);
+          canvas.drawCircle(
+              center, radius, Paint()..color = ShutterColors.lightOn);
+          canvas.drawCircle(center.translate(-radius * .18, -radius * .18),
+              radius * .34, Paint()..color = ShutterColors.lightCore);
         } else {
-          canvas.drawCircle(center, radius * 1.08, Paint()..color = const Color(0xFF171713));
+          canvas.drawCircle(
+              center, radius * 1.08, Paint()..color = const Color(0xFF171713));
           canvas.drawCircle(
             center,
             radius * .7,
             Paint()..color = ShutterColors.lightOff.withValues(alpha: .52),
           );
         }
+      }
+    }
+  }
+
+  void _drawRailGuides(Canvas canvas, Rect cavity) {
+    for (var index = 0; index < level.plates.length; index++) {
+      final plate = level.plates[index];
+      final isHorizontal = plate.axis == PlateAxis.horizontal;
+      final center = isHorizontal
+          ? Offset(cavity.center.dx, cavity.top + cavity.height * .37)
+          : Offset(cavity.left + cavity.width * .63, cavity.center.dy);
+      final railStart = isHorizontal
+          ? Offset(cavity.left + 12, center.dy)
+          : Offset(center.dx, cavity.top + 12);
+      final railEnd = isHorizontal
+          ? Offset(cavity.right - 12, center.dy)
+          : Offset(center.dx, cavity.bottom - 12);
+      final railPaint = Paint()
+        ..color = Colors.black.withValues(alpha: .28)
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 8;
+      canvas.drawLine(railStart, railEnd, railPaint);
+      canvas.drawLine(
+        railStart,
+        railEnd,
+        Paint()
+          ..color = ShutterColors.brassDark.withValues(alpha: .55)
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = 2,
+      );
+      for (var notch = 0; notch < plate.notchCount; notch++) {
+        final t = plate.notchCount == 1 ? .5 : notch / (plate.notchCount - 1);
+        final marker = Offset.lerp(railStart, railEnd, .12 + t * .76)!;
+        final highlighted = hint?.plateIndex == index && hint?.notch == notch;
+        canvas.drawCircle(
+          marker,
+          highlighted ? 5.2 : 3.2,
+          Paint()
+            ..color = highlighted
+                ? ShutterColors.brassLight
+                : ShutterColors.brassDark,
+        );
+        canvas.drawCircle(
+          marker,
+          highlighted ? 2.2 : 1.4,
+          Paint()
+            ..color =
+                highlighted ? ShutterColors.surfaceLight : ShutterColors.cavity,
+        );
       }
     }
   }
@@ -262,12 +334,21 @@ class ShutterBoardPainter extends CustomPainter {
     final offset = (notch - midpoint) * cavity.shortestSide * .13;
     final isHorizontal = plate.axis == PlateAxis.horizontal;
     final rect = Rect.fromCenter(
-      center: cavity.center + (isHorizontal ? Offset(offset, -cavity.height * .13) : Offset(cavity.width * .13, offset)),
+      center: cavity.center +
+          (isHorizontal
+              ? Offset(offset, -cavity.height * .13)
+              : Offset(cavity.width * .13, offset)),
       width: isHorizontal ? cavity.width * .82 : cavity.width * .28,
       height: isHorizontal ? cavity.height * .28 : cavity.height * .82,
     );
     final elevated = draggedPlate == index;
-    final platePath = Path()..addRRect(RRect.fromRectAndRadius(rect.translate(0, elevated ? -2 : 0), Radius.circular(cavity.width * .035)));
+    final platePath = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          rect.translate(0, elevated ? -2 : 0),
+          Radius.circular(cavity.width * .035),
+        ),
+      );
     final nearest = notch.round().clamp(0, plate.notchCount - 1);
     final mask = plate.masks[nearest];
     final cellW = cavity.width / level.columns;
@@ -276,9 +357,11 @@ class ShutterBoardPainter extends CustomPainter {
       if (!mask[cell]) continue;
       final row = cell ~/ level.columns;
       final column = cell % level.columns;
-      final holeCenter = Offset(cavity.left + (column + .5) * cellW, cavity.top + (row + .5) * cellH);
+      final holeCenter = Offset(
+          cavity.left + (column + .5) * cellW, cavity.top + (row + .5) * cellH);
       if (rect.inflate(cellW * .12).contains(holeCenter)) {
-        platePath.addOval(Rect.fromCircle(center: holeCenter, radius: math.min(cellW, cellH) * .135));
+        platePath.addOval(Rect.fromCircle(
+            center: holeCenter, radius: math.min(cellW, cellH) * .135));
       }
     }
     platePath.fillType = PathFillType.evenOdd;
@@ -290,11 +373,14 @@ class ShutterBoardPainter extends CustomPainter {
     );
     canvas.drawPath(
       platePath,
-      Paint()..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFF9F6F0), Color(0xFFE2DDD3), Color(0xFFCFC8BC)],
-      ).createShader(rect),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: index == 0
+              ? const [Color(0xFFF9F6F0), Color(0xFFE2DDD3), Color(0xFFCFC8BC)]
+              : const [Color(0xFFE9ECE6), Color(0xFFD2D7D0), Color(0xFFB9C0B8)],
+        ).createShader(rect),
     );
     canvas.drawPath(
       platePath,
@@ -303,33 +389,7 @@ class ShutterBoardPainter extends CustomPainter {
         ..strokeWidth = 1
         ..color = Colors.white.withValues(alpha: .55),
     );
-
-    final railStart = isHorizontal
-        ? Offset(cavity.left + 18, rect.center.dy)
-        : Offset(rect.center.dx, cavity.top + 18);
-    final railEnd = isHorizontal
-        ? Offset(cavity.right - 18, rect.center.dy)
-        : Offset(rect.center.dx, cavity.bottom - 18);
-    canvas.drawLine(
-      railStart,
-      railEnd,
-      Paint()
-        ..color = ShutterColors.brassDark.withValues(alpha: .55)
-        ..strokeWidth = 2,
-    );
-    for (var notchIndex = 0; notchIndex < plate.notchCount; notchIndex++) {
-      final t = plate.notchCount == 1 ? .5 : notchIndex / (plate.notchCount - 1);
-      final marker = Offset.lerp(railStart, railEnd, .34 + t * .32)!;
-      final highlighted = hint?.plateIndex == index && hint?.notch == notchIndex;
-      canvas.drawCircle(
-        marker,
-        highlighted ? 4 : 2,
-        Paint()
-          ..color = highlighted
-              ? ShutterColors.brassLight
-              : ShutterColors.brassDark.withValues(alpha: .42),
-      );
-    }
+    _drawApertureRims(canvas, cavity, rect, mask);
     final knob = rect.center;
     canvas.drawCircle(
       knob.translate(0, 2),
@@ -339,16 +399,112 @@ class ShutterBoardPainter extends CustomPainter {
     canvas.drawCircle(
       knob,
       11,
-      Paint()..shader = const RadialGradient(
-        center: Alignment(-.35, -.4),
-        colors: [ShutterColors.brassLight, ShutterColors.brass, ShutterColors.brassDark],
-      ).createShader(Rect.fromCircle(center: knob, radius: 11)),
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(-.35, -.4),
+          colors: [
+            ShutterColors.brassLight,
+            ShutterColors.brass,
+            ShutterColors.brassDark
+          ],
+        ).createShader(Rect.fromCircle(center: knob, radius: 11)),
     );
     canvas.drawCircle(
       knob.translate(-2.5, -2.5),
       2.2,
       Paint()..color = Colors.white.withValues(alpha: .35),
     );
+    _drawDirectionMark(canvas, knob, isHorizontal);
+    _drawPlateTag(canvas, rect, index, isHorizontal);
+  }
+
+  void _drawApertureRims(
+      Canvas canvas, Rect cavity, Rect rect, List<bool> mask) {
+    final cellW = cavity.width / level.columns;
+    final cellH = cavity.height / level.rows;
+    final radius = math.min(cellW, cellH) * .135;
+    for (var cell = 0; cell < mask.length; cell++) {
+      if (!mask[cell]) continue;
+      final row = cell ~/ level.columns;
+      final column = cell % level.columns;
+      final center = Offset(
+          cavity.left + (column + .5) * cellW, cavity.top + (row + .5) * cellH);
+      if (!rect.inflate(cellW * .12).contains(center)) continue;
+      canvas.drawCircle(
+        center,
+        radius * 1.25,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.8
+          ..color = Colors.black.withValues(alpha: .32),
+      );
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius * 1.12),
+        math.pi * 1.08,
+        math.pi * .7,
+        false,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1
+          ..color = Colors.white.withValues(alpha: .6),
+      );
+    }
+  }
+
+  void _drawDirectionMark(Canvas canvas, Offset center, bool isHorizontal) {
+    final offset = isHorizontal ? const Offset(6, 0) : const Offset(0, 6);
+    final from = center - offset;
+    final to = center + offset;
+    final paint = Paint()
+      ..color = ShutterColors.cavity.withValues(alpha: .65)
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(from, to, paint);
+    final cross =
+        isHorizontal ? const Offset(2.8, 2.8) : const Offset(2.8, 2.8);
+    if (isHorizontal) {
+      canvas.drawLine(from, from + Offset(3, -cross.dy), paint);
+      canvas.drawLine(from, from + Offset(3, cross.dy), paint);
+      canvas.drawLine(to, to - Offset(3, -cross.dy), paint);
+      canvas.drawLine(to, to - Offset(3, cross.dy), paint);
+    } else {
+      canvas.drawLine(from, from + Offset(-cross.dx, 3), paint);
+      canvas.drawLine(from, from + Offset(cross.dx, 3), paint);
+      canvas.drawLine(to, to - Offset(-cross.dx, 3), paint);
+      canvas.drawLine(to, to - Offset(cross.dx, 3), paint);
+    }
+  }
+
+  void _drawPlateTag(Canvas canvas, Rect rect, int index, bool isHorizontal) {
+    final tag = index == 0 ? 'A  HORIZONTAL' : 'B  VERTICAL';
+    final text = TextPainter(
+      text: TextSpan(
+        text: tag,
+        style: TextStyle(
+          color: ShutterColors.cavity.withValues(alpha: .52),
+          fontSize: 7,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.1,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final origin = isHorizontal
+        ? Offset(rect.left + 11, rect.top + 9)
+        : Offset(rect.left + 7, rect.bottom - text.height - 9);
+    canvas.save();
+    if (!isHorizontal) {
+      canvas.translate(rect.center.dx, rect.center.dy);
+      canvas.rotate(-math.pi / 2);
+      canvas.translate(-rect.center.dx, -rect.center.dy);
+      text.paint(
+          canvas,
+          Offset(rect.center.dx - text.width / 2,
+              rect.center.dy - rect.width / 2 + 9));
+    } else {
+      text.paint(canvas, origin);
+    }
+    canvas.restore();
   }
 
   void _drawFrameHighlight(Canvas canvas, RRect frame) {
