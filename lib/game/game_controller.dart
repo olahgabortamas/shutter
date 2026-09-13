@@ -1,9 +1,10 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 import '../domain/shutter_level.dart';
+
+enum GameHaptic { selection, lightImpact, success }
 
 class PlateMove {
   const PlateMove(this.plateIndex, this.notch);
@@ -13,9 +14,11 @@ class PlateMove {
 }
 
 class GameController extends ChangeNotifier {
-  GameController(this.level) : _positions = List<int>.of(level.initialPositions);
+  GameController(this.level, {this.onHaptic})
+      : _positions = List<int>.of(level.initialPositions);
 
   final ShutterLevel level;
+  final ValueChanged<GameHaptic>? onHaptic;
   List<int> _positions;
   final List<List<int>> _history = [];
   PlateMove? _hint;
@@ -33,8 +36,8 @@ class GameController extends ChangeNotifier {
     _history.add(List<int>.of(_positions));
     _positions[plateIndex] = next;
     _hint = null;
-    HapticFeedback.lightImpact();
-    if (solved) HapticFeedback.mediumImpact();
+    onHaptic?.call(GameHaptic.lightImpact);
+    if (solved) onHaptic?.call(GameHaptic.success);
     notifyListeners();
   }
 
@@ -42,7 +45,7 @@ class GameController extends ChangeNotifier {
     if (_history.isEmpty) return;
     _positions = _history.removeLast();
     _hint = null;
-    HapticFeedback.selectionClick();
+    onHaptic?.call(GameHaptic.selection);
     notifyListeners();
   }
 
@@ -51,13 +54,13 @@ class GameController extends ChangeNotifier {
     _history.add(List<int>.of(_positions));
     _positions = List<int>.of(level.initialPositions);
     _hint = null;
-    HapticFeedback.selectionClick();
+    onHaptic?.call(GameHaptic.selection);
     notifyListeners();
   }
 
   PlateMove? requestHint() {
     _hint = _findFirstMoveToSolution();
-    if (_hint != null) HapticFeedback.selectionClick();
+    if (_hint != null) onHaptic?.call(GameHaptic.selection);
     notifyListeners();
     return _hint;
   }

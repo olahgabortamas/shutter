@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../data/level_repository.dart';
 import '../domain/shutter_level.dart';
@@ -43,7 +44,25 @@ class _LoadedGame extends StatefulWidget {
 }
 
 class _LoadedGameState extends State<_LoadedGame> {
-  late final GameController controller = GameController(widget.level)..addListener(_refresh);
+  late final GameController controller = GameController(
+    widget.level,
+    onHaptic: _handleHaptic,
+  )..addListener(_refresh);
+
+  void _handleHaptic(GameHaptic haptic) {
+    switch (haptic) {
+      case GameHaptic.selection:
+        HapticFeedback.selectionClick();
+        return;
+      case GameHaptic.lightImpact:
+        HapticFeedback.lightImpact();
+        return;
+      case GameHaptic.success:
+        HapticFeedback.mediumImpact();
+        return;
+    }
+  }
+
   void _refresh() => setState(() {});
 
   @override
