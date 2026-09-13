@@ -19,14 +19,14 @@ This repository contains the first Flutter vertical slice:
 Install a current stable Flutter SDK, then run:
 
 ```sh
-flutter create --platforms=android,ios .
 flutter pub get
 flutter test
-flutter run
+flutter run -d edge
 ```
 
-`flutter create` adds the generated platform runner directories while preserving
-the implementation in `lib/`, tests, assets, and project metadata.
+For a browser preview, `flutter run -d web-server --web-port 8080` serves the
+game at `http://localhost:8080`. The repository includes its web runner; add
+native mobile runners later with `flutter create --platforms=android,ios .`.
 
 ## Architecture
 
@@ -46,5 +46,5 @@ keeps future level generation and validation straightforward.
 
 The current build covers the first five mechanisms in Chapter 1: Aperture.
 Locks, coupled mechanisms,
-ratchets, spectrum filters, persistence, audio, monetization, and analytics are
+ratchets, spectrum filters, audio, monetization, and analytics are
 intentionally deferred until the core interaction has been play-tested.

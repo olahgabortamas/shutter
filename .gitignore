@@ -2,10 +2,8 @@
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.packages
 build/
 coverage/
-pubspec.lock
 
 # Editors and operating systems
 .idea/
@@ -18,4 +16,3 @@ Thumbs.db
 android/key.properties
 *.jks
 *.keystore
-
