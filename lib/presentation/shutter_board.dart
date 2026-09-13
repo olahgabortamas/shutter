@@ -1,15 +1,21 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../domain/shutter_level.dart';
 import '../game/game_controller.dart';
 import 'shutter_theme.dart';
 
 class ShutterBoard extends StatefulWidget {
-  const ShutterBoard({required this.controller, super.key});
+  const ShutterBoard({
+    required this.controller,
+    required this.reduceMotion,
+    this.onGrab,
+    super.key,
+  });
   final GameController controller;
+  final bool reduceMotion;
+  final VoidCallback? onGrab;
 
   @override
   State<ShutterBoard> createState() => _ShutterBoardState();
@@ -29,7 +35,7 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _visualNotches = widget.controller.positions.map((value) => value.toDouble()).toList();
-    _snapController = AnimationController(vsync: this, duration: const Duration(milliseconds: 140))
+    _snapController = AnimationController(vsync: this, duration: _snapDuration)
       ..addListener(() {
         final index = _snappingPlate;
         if (index == null) return;
@@ -56,7 +62,13 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
       widget.controller.addListener(_syncFromController);
       _syncFromController();
     }
+    if (oldWidget.reduceMotion != widget.reduceMotion) {
+      _snapController.duration = _snapDuration;
+    }
   }
+
+  Duration get _snapDuration =>
+      widget.reduceMotion ? Duration.zero : const Duration(milliseconds: 140);
 
   void _syncFromController() {
     if (_draggedPlate != null || _snapController.isAnimating) return;
@@ -90,7 +102,7 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
       _dragStartNotch = _visualNotches[index];
       _dragDistance = 0;
     });
-    HapticFeedback.selectionClick();
+    widget.onGrab?.call();
   }
 
   void _update(DragUpdateDetails details, Size size) {
@@ -117,6 +129,11 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
       _snapFrom = from;
       _snapTo = target;
     });
+    if (widget.reduceMotion) {
+      _snappingPlate = null;
+      widget.controller.movePlate(index, target.round());
+      return;
+    }
     _snapController
       ..reset()
       ..animateTo(1, curve: Curves.easeOutCubic);

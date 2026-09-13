@@ -5,6 +5,8 @@ import '../data/level_repository.dart';
 import '../domain/shutter_level.dart';
 import '../game/game_controller.dart';
 import 'game_controls.dart';
+import 'game_preferences.dart';
+import 'game_settings_sheet.dart';
 import 'shutter_board.dart';
 import 'shutter_theme.dart';
 import 'target_preview.dart';
@@ -20,29 +22,40 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late final Future<List<ShutterLevel>> _campaign =
       widget.repository.loadCampaign();
+  late final GamePreferences _preferences = GamePreferences();
+
+  @override
+  void dispose() {
+    _preferences.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ShutterLevel>>(
-      future: _campaign,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) return _LoadError(error: snapshot.error);
-        if (!snapshot.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator(strokeWidth: 1.5)));
-        }
-        final levels = snapshot.requireData;
-        if (levels.isEmpty) {
-          return const _LoadError(error: 'The campaign contains no levels.');
-        }
-        return _CampaignGame(levels: levels);
-      },
+    return ListenableBuilder(
+      listenable: _preferences,
+      builder: (context, child) => FutureBuilder<List<ShutterLevel>>(
+        future: _campaign,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return _LoadError(error: snapshot.error);
+          if (!snapshot.hasData) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator(strokeWidth: 1.5)));
+          }
+          final levels = snapshot.requireData;
+          if (levels.isEmpty) {
+            return const _LoadError(error: 'The campaign contains no levels.');
+          }
+          return _CampaignGame(levels: levels, preferences: _preferences);
+        },
+      ),
     );
   }
 }
 
 class _CampaignGame extends StatefulWidget {
-  const _CampaignGame({required this.levels});
+  const _CampaignGame({required this.levels, required this.preferences});
   final List<ShutterLevel> levels;
+  final GamePreferences preferences;
 
   @override
   State<_CampaignGame> createState() => _CampaignGameState();
@@ -63,6 +76,7 @@ class _CampaignGameState extends State<_CampaignGame> {
     return _LoadedGame(
       key: ValueKey(level.id),
       level: level,
+      preferences: widget.preferences,
       isLastLevel: _levelIndex == widget.levels.length - 1,
       onAdvance: _advance,
     );
@@ -72,11 +86,13 @@ class _CampaignGameState extends State<_CampaignGame> {
 class _LoadedGame extends StatefulWidget {
   const _LoadedGame({
     required this.level,
+    required this.preferences,
     required this.isLastLevel,
     required this.onAdvance,
     super.key,
   });
   final ShutterLevel level;
+  final GamePreferences preferences;
   final bool isLastLevel;
   final VoidCallback onAdvance;
 
@@ -91,6 +107,7 @@ class _LoadedGameState extends State<_LoadedGame> {
   )..addListener(_refresh);
 
   void _handleHaptic(GameHaptic haptic) {
+    if (!widget.preferences.hapticsEnabled) return;
     switch (haptic) {
       case GameHaptic.selection:
         HapticFeedback.selectionClick();
@@ -105,6 +122,38 @@ class _LoadedGameState extends State<_LoadedGame> {
   }
 
   void _refresh() => setState(() {});
+
+  void _openSettings() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: ShutterColors.background,
+      builder: (context) => GameSettingsSheet(preferences: widget.preferences),
+    );
+  }
+
+  void _openPause() {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: ShutterColors.surfaceLight,
+        title: const Text('PAUSED', style: TextStyle(letterSpacing: 3, fontSize: 13)),
+        content: const Text('Take your time. The mechanism will wait.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.reset();
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('RESTART'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('RESUME'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -130,8 +179,8 @@ class _LoadedGameState extends State<_LoadedGame> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _TopButton(icon: Icons.pause_rounded, label: 'Pause', onPressed: () {}),
-                        _TopButton(icon: Icons.tune_rounded, label: 'Settings', onPressed: () {}),
+                        _TopButton(icon: Icons.pause_rounded, label: 'Pause', onPressed: _openPause),
+                        _TopButton(icon: Icons.tune_rounded, label: 'Settings', onPressed: _openSettings),
                       ],
                     ),
                   ),
@@ -161,7 +210,7 @@ class _LoadedGameState extends State<_LoadedGame> {
                   TargetPreview(level: widget.level, confirmed: controller.solved),
                   const SizedBox(height: 7),
                   AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
+                    duration: widget.preferences.reducedMotion ? Duration.zero : const Duration(milliseconds: 300),
                     child: Text(
                       controller.solved
                           ? 'COMPLETE'
@@ -177,7 +226,7 @@ class _LoadedGameState extends State<_LoadedGame> {
                     ),
                   ),
                   AnimatedSize(
-                    duration: const Duration(milliseconds: 260),
+                    duration: widget.preferences.reducedMotion ? Duration.zero : const Duration(milliseconds: 260),
                     curve: Curves.easeOutCubic,
                     child: widget.level.number == 1 && !controller.hasMoved
                         ? const _FirstMoveGuide()
@@ -188,7 +237,11 @@ class _LoadedGameState extends State<_LoadedGame> {
                     dimension: boardSize,
                     child: Padding(
                       padding: const EdgeInsets.all(8),
-                      child: ShutterBoard(controller: controller),
+                      child: ShutterBoard(
+                        controller: controller,
+                        reduceMotion: widget.preferences.reducedMotion,
+                        onGrab: () => _handleHaptic(GameHaptic.selection),
+                      ),
                     ),
                   ),
                   SizedBox(height: compact ? 12 : 20),
@@ -200,7 +253,7 @@ class _LoadedGameState extends State<_LoadedGame> {
                   ),
                   const SizedBox(height: 14),
                   AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 450),
+                    duration: widget.preferences.reducedMotion ? Duration.zero : const Duration(milliseconds: 450),
                     switchInCurve: Curves.easeOutCubic,
                     child: controller.solved
                         ? _AdvanceButton(

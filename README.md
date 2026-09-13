@@ -10,6 +10,7 @@ This repository contains the first Flutter vertical slice:
 - drag-to-slide plates with discrete notch snapping and haptics;
 - a custom-painted ceramic, graphite, brass, and amber board;
 - undo, one-move hint, reset, automatic completion, and level progression;
+- functional pause and game-feel controls, including haptic and reduced-motion settings;
 - unit and widget tests.
 
 ## Run locally

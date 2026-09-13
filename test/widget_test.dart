@@ -45,4 +45,17 @@ void main() {
     expect(find.text('HINT'), findsOneWidget);
     expect(find.text('RESET'), findsOneWidget);
   });
+
+  testWidgets('settings expose haptic and reduced-motion options', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: GameScreen(repository: _MemoryRepository())));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('GAME FEEL'), findsOneWidget);
+    expect(find.text('Haptics'), findsOneWidget);
+    expect(find.text('Reduced motion'), findsOneWidget);
+    expect(find.byType(Switch), findsNWidgets(2));
+  });
 }
