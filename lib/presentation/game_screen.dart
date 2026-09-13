@@ -163,14 +163,25 @@ class _LoadedGameState extends State<_LoadedGame> {
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: Text(
-                      controller.solved ? 'COMPLETE' : 'TARGET',
-                      key: ValueKey(controller.solved),
+                      controller.solved
+                          ? 'COMPLETE'
+                          : controller.hasMoved || widget.level.number != 1
+                          ? 'TARGET'
+                          : 'REVEAL THIS PATTERN',
+                      key: ValueKey((controller.solved, controller.hasMoved)),
                       style: TextStyle(
                         fontSize: 9,
                         letterSpacing: 3,
                         color: controller.solved ? ShutterColors.brassDark : ShutterColors.muted,
                       ),
                     ),
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 260),
+                    curve: Curves.easeOutCubic,
+                    child: widget.level.number == 1 && !controller.hasMoved
+                        ? const _FirstMoveGuide()
+                        : const SizedBox.shrink(),
                   ),
                   SizedBox(height: compact ? 10 : 18),
                   SizedBox.square(
@@ -208,6 +219,53 @@ class _LoadedGameState extends State<_LoadedGame> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class _FirstMoveGuide extends StatelessWidget {
+  const _FirstMoveGuide();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Semantics(
+        label: 'How to play: slide both shutters. A lamp appears only where both apertures align. Match the target pattern.',
+        child: Container(
+          width: 286,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: ShutterColors.surfaceLight.withValues(alpha: .65),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ShutterColors.hairline),
+          ),
+          child: const Column(
+            children: [
+              Text(
+                'SLIDE BOTH SHUTTERS',
+                style: TextStyle(
+                  color: ShutterColors.text,
+                  fontSize: 10,
+                  letterSpacing: 2.2,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 7),
+              Text(
+                'A lamp appears only where both apertures align.\nMatch the target pattern above.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: ShutterColors.muted,
+                  fontFamily: 'Inter',
+                  fontSize: 12,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -39,6 +39,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('SHUTTER'), findsOneWidget);
     expect(find.text('LEVEL 01'), findsOneWidget);
+    expect(find.text('REVEAL THIS PATTERN'), findsOneWidget);
+    expect(find.text('SLIDE BOTH SHUTTERS'), findsOneWidget);
     expect(find.text('UNDO'), findsOneWidget);
     expect(find.text('HINT'), findsOneWidget);
     expect(find.text('RESET'), findsOneWidget);

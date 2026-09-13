@@ -27,6 +27,7 @@ class GameController extends ChangeNotifier {
   List<bool> get visibleLights => level.visibleLights(_positions);
   bool get solved => level.isSolved(_positions);
   bool get canUndo => _history.isNotEmpty;
+  bool get hasMoved => _history.isNotEmpty;
   PlateMove? get hint => _hint;
 
   void movePlate(int plateIndex, int notch) {
