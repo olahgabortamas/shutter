@@ -48,19 +48,22 @@ class _MemoryPreferencesStore implements GamePreferencesStore {
 
 void main() {
   testWidgets('renders the first playable screen', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: GameScreen(repository: _MemoryRepository())));
+    await tester.pumpWidget(
+        MaterialApp(home: GameScreen(repository: _MemoryRepository())));
     await tester.pumpAndSettle();
     expect(find.text('SHUTTER'), findsOneWidget);
     expect(find.text('LEVEL 01'), findsOneWidget);
     expect(find.text('REVEAL THIS PATTERN'), findsOneWidget);
-    expect(find.text('SLIDE BOTH SHUTTERS'), findsOneWidget);
+    expect(find.text('MOVE THE TWO PLATES'), findsOneWidget);
     expect(find.text('UNDO'), findsOneWidget);
     expect(find.text('HINT'), findsOneWidget);
     expect(find.text('RESET'), findsOneWidget);
   });
 
-  testWidgets('settings expose haptic and reduced-motion options', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: GameScreen(repository: _MemoryRepository())));
+  testWidgets('settings expose haptic and reduced-motion options',
+      (tester) async {
+    await tester.pumpWidget(
+        MaterialApp(home: GameScreen(repository: _MemoryRepository())));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Settings'));
