@@ -241,7 +241,7 @@ class ShutterBoardPainter extends CustomPainter {
     );
     final elevated = draggedPlate == index;
     final platePath = Path()..addRRect(RRect.fromRectAndRadius(rect.translate(0, elevated ? -2 : 0), Radius.circular(cavity.width * .035)));
-    final nearest = notch.round().clamp(0, plate.notchCount - 1) as int;
+    final nearest = notch.round().clamp(0, plate.notchCount - 1);
     final mask = plate.masks[nearest];
     final cellW = cavity.width / level.columns;
     final cellH = cavity.height / level.rows;

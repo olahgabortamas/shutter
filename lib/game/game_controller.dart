@@ -28,7 +28,7 @@ class GameController extends ChangeNotifier {
 
   void movePlate(int plateIndex, int notch) {
     final plate = level.plates[plateIndex];
-    final next = notch.clamp(0, plate.notchCount - 1) as int;
+    final next = notch.clamp(0, plate.notchCount - 1);
     if (_positions[plateIndex] == next) return;
     _history.add(List<int>.of(_positions));
     _positions[plateIndex] = next;

@@ -71,7 +71,7 @@ class ShutterLevel {
       if (!baseLights[cell]) return false;
       for (var plateIndex = 0; plateIndex < plates.length; plateIndex++) {
         final plate = plates[plateIndex];
-        final notch = positions[plateIndex].clamp(0, plate.notchCount - 1) as int;
+        final notch = positions[plateIndex].clamp(0, plate.notchCount - 1);
         if (!plate.masks[notch][cell]) return false;
       }
       return true;
