@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shutter/data/level_repository.dart';
 import 'package:shutter/domain/shutter_level.dart';
 import 'package:shutter/presentation/game_screen.dart';
+import 'package:shutter/presentation/game_preferences.dart';
 
 class _MemoryRepository implements LevelRepository {
   ShutterLevel get level => const ShutterLevel(
@@ -33,6 +34,18 @@ class _MemoryRepository implements LevelRepository {
   Future<List<ShutterLevel>> loadCampaign() async => [level];
 }
 
+class _MemoryPreferencesStore implements GamePreferencesStore {
+  StoredGamePreferences value = const StoredGamePreferences();
+
+  @override
+  Future<StoredGamePreferences> read() async => value;
+
+  @override
+  Future<void> write(StoredGamePreferences preferences) async {
+    value = preferences;
+  }
+}
+
 void main() {
   testWidgets('renders the first playable screen', (tester) async {
     await tester.pumpWidget(MaterialApp(home: GameScreen(repository: _MemoryRepository())));
@@ -57,5 +70,19 @@ void main() {
     expect(find.text('Haptics'), findsOneWidget);
     expect(find.text('Reduced motion'), findsOneWidget);
     expect(find.byType(Switch), findsNWidgets(2));
+  });
+
+  test('preferences save game feel and campaign progress', () async {
+    final store = _MemoryPreferencesStore();
+    final preferences = await GamePreferences.load(store: store);
+
+    preferences.currentLevelIndex = 3;
+    preferences.hapticsEnabled = false;
+    preferences.reducedMotion = true;
+    await Future<void>.delayed(Duration.zero);
+
+    expect(store.value.currentLevelIndex, 3);
+    expect(store.value.hapticsEnabled, isFalse);
+    expect(store.value.reducedMotion, isTrue);
   });
 }

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app.dart';
+import 'presentation/game_preferences.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(const [DeviceOrientation.portraitUp]);
-  runApp(const ShutterApp());
+  final preferences = await GamePreferences.load();
+  runApp(ShutterApp(preferences: preferences));
 }
-

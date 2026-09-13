@@ -11,6 +11,7 @@ This repository contains the first Flutter vertical slice:
 - a custom-painted ceramic, graphite, brass, and amber board;
 - undo, one-move hint, reset, automatic completion, and level progression;
 - functional pause and game-feel controls, including haptic and reduced-motion settings;
+- automatic local persistence for campaign progress and game-feel preferences;
 - unit and widget tests.
 
 ## Run locally

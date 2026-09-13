@@ -12,8 +12,13 @@ import 'shutter_theme.dart';
 import 'target_preview.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({required this.repository, super.key});
+  const GameScreen({
+    required this.repository,
+    this.preferences,
+    super.key,
+  });
   final LevelRepository repository;
+  final GamePreferences? preferences;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -22,11 +27,11 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late final Future<List<ShutterLevel>> _campaign =
       widget.repository.loadCampaign();
-  late final GamePreferences _preferences = GamePreferences();
+  late final GamePreferences _preferences = widget.preferences ?? GamePreferences();
 
   @override
   void dispose() {
-    _preferences.dispose();
+    if (widget.preferences == null) _preferences.dispose();
     super.dispose();
   }
 
@@ -62,11 +67,13 @@ class _CampaignGame extends StatefulWidget {
 }
 
 class _CampaignGameState extends State<_CampaignGame> {
-  int _levelIndex = 0;
+  late int _levelIndex = widget.preferences.currentLevelIndex
+      .clamp(0, widget.levels.length - 1);
 
   void _advance() {
     setState(() {
       _levelIndex = (_levelIndex + 1) % widget.levels.length;
+      widget.preferences.currentLevelIndex = _levelIndex;
     });
   }
 
