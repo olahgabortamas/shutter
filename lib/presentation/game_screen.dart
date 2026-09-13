@@ -154,7 +154,7 @@ class _TopButton extends StatelessWidget {
       style: IconButton.styleFrom(
         minimumSize: const Size.square(46),
         side: const BorderSide(color: ShutterColors.hairline),
-        backgroundColor: ShutterColors.surfaceLight.withOpacity(.45),
+        backgroundColor: ShutterColors.surfaceLight.withValues(alpha: .45),
       ),
     );
   }
@@ -176,4 +176,3 @@ class _LoadError extends StatelessWidget {
     );
   }
 }
-

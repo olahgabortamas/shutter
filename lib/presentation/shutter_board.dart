@@ -170,7 +170,12 @@ class ShutterBoardPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final outer = Offset.zero & size;
     final frame = RRect.fromRectAndRadius(outer.deflate(size.width * .015), Radius.circular(size.width * .075));
-    canvas.drawShadow(Path()..addRRect(frame), Colors.black.withOpacity(.22), 12, false);
+    canvas.drawShadow(
+      Path()..addRRect(frame),
+      Colors.black.withValues(alpha: .22),
+      12,
+      false,
+    );
     canvas.drawRRect(
       frame,
       Paint()..shader = const LinearGradient(
@@ -214,7 +219,7 @@ class ShutterBoardPainter extends CustomPainter {
             center,
             radius * 3,
             Paint()..shader = RadialGradient(colors: [
-              ShutterColors.lightOn.withOpacity(solved ? .28 : .2),
+              ShutterColors.lightOn.withValues(alpha: solved ? .28 : .2),
               Colors.transparent,
             ]).createShader(Rect.fromCircle(center: center, radius: radius * 3)),
           );
@@ -222,7 +227,11 @@ class ShutterBoardPainter extends CustomPainter {
           canvas.drawCircle(center.translate(-radius * .18, -radius * .18), radius * .34, Paint()..color = ShutterColors.lightCore);
         } else {
           canvas.drawCircle(center, radius * 1.08, Paint()..color = const Color(0xFF171713));
-          canvas.drawCircle(center, radius * .7, Paint()..color = ShutterColors.lightOff.withOpacity(.52));
+          canvas.drawCircle(
+            center,
+            radius * .7,
+            Paint()..color = ShutterColors.lightOff.withValues(alpha: .52),
+          );
         }
       }
     }
@@ -255,7 +264,12 @@ class ShutterBoardPainter extends CustomPainter {
       }
     }
     platePath.fillType = PathFillType.evenOdd;
-    canvas.drawShadow(platePath, Colors.black.withOpacity(elevated ? .48 : .32), elevated ? 7 : 4, false);
+    canvas.drawShadow(
+      platePath,
+      Colors.black.withValues(alpha: elevated ? .48 : .32),
+      elevated ? 7 : 4,
+      false,
+    );
     canvas.drawPath(
       platePath,
       Paint()..shader = const LinearGradient(
@@ -264,7 +278,13 @@ class ShutterBoardPainter extends CustomPainter {
         colors: [Color(0xFFF9F6F0), Color(0xFFE2DDD3), Color(0xFFCFC8BC)],
       ).createShader(rect),
     );
-    canvas.drawPath(platePath, Paint()..style = PaintingStyle.stroke..strokeWidth = 1..color = Colors.white.withOpacity(.55));
+    canvas.drawPath(
+      platePath,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = Colors.white.withValues(alpha: .55),
+    );
 
     final railStart = isHorizontal
         ? Offset(cavity.left + 18, rect.center.dy)
@@ -272,15 +292,32 @@ class ShutterBoardPainter extends CustomPainter {
     final railEnd = isHorizontal
         ? Offset(cavity.right - 18, rect.center.dy)
         : Offset(rect.center.dx, cavity.bottom - 18);
-    canvas.drawLine(railStart, railEnd, Paint()..color = ShutterColors.brassDark.withOpacity(.55)..strokeWidth = 2);
+    canvas.drawLine(
+      railStart,
+      railEnd,
+      Paint()
+        ..color = ShutterColors.brassDark.withValues(alpha: .55)
+        ..strokeWidth = 2,
+    );
     for (var notchIndex = 0; notchIndex < plate.notchCount; notchIndex++) {
       final t = plate.notchCount == 1 ? .5 : notchIndex / (plate.notchCount - 1);
       final marker = Offset.lerp(railStart, railEnd, .34 + t * .32)!;
       final highlighted = hint?.plateIndex == index && hint?.notch == notchIndex;
-      canvas.drawCircle(marker, highlighted ? 4 : 2, Paint()..color = highlighted ? ShutterColors.brassLight : ShutterColors.brassDark.withOpacity(.42));
+      canvas.drawCircle(
+        marker,
+        highlighted ? 4 : 2,
+        Paint()
+          ..color = highlighted
+              ? ShutterColors.brassLight
+              : ShutterColors.brassDark.withValues(alpha: .42),
+      );
     }
     final knob = rect.center;
-    canvas.drawCircle(knob.translate(0, 2), 12, Paint()..color = Colors.black.withOpacity(.22));
+    canvas.drawCircle(
+      knob.translate(0, 2),
+      12,
+      Paint()..color = Colors.black.withValues(alpha: .22),
+    );
     canvas.drawCircle(
       knob,
       11,
@@ -289,7 +326,11 @@ class ShutterBoardPainter extends CustomPainter {
         colors: [ShutterColors.brassLight, ShutterColors.brass, ShutterColors.brassDark],
       ).createShader(Rect.fromCircle(center: knob, radius: 11)),
     );
-    canvas.drawCircle(knob.translate(-2.5, -2.5), 2.2, Paint()..color = Colors.white.withOpacity(.35));
+    canvas.drawCircle(
+      knob.translate(-2.5, -2.5),
+      2.2,
+      Paint()..color = Colors.white.withValues(alpha: .35),
+    );
   }
 
   void _drawFrameHighlight(Canvas canvas, RRect frame) {
@@ -298,7 +339,7 @@ class ShutterBoardPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.2
-        ..color = Colors.white.withOpacity(.72),
+        ..color = Colors.white.withValues(alpha: .72),
     );
   }
 

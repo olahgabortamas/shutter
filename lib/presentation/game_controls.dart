@@ -56,7 +56,7 @@ class _Control extends StatelessWidget {
                 height: 54,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: ShutterColors.surfaceLight.withOpacity(.78),
+                  color: ShutterColors.surfaceLight.withValues(alpha: .78),
                   border: Border.all(color: ShutterColors.hairline),
                   boxShadow: const [
                     BoxShadow(color: Color(0x10000000), blurRadius: 8, offset: Offset(0, 3)),
@@ -80,4 +80,3 @@ class _Control extends StatelessWidget {
     );
   }
 }
-

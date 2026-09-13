@@ -49,7 +49,10 @@ class _TargetPainter extends CustomPainter {
         canvas.drawCircle(
           center,
           active ? 3.6 : 2.2,
-          Paint()..color = active ? ShutterColors.brass : ShutterColors.hairline.withOpacity(.35),
+          Paint()
+            ..color = active
+                ? ShutterColors.brass
+                : ShutterColors.hairline.withValues(alpha: .35),
         );
       }
     }
@@ -58,4 +61,3 @@ class _TargetPainter extends CustomPainter {
   @override
   bool shouldRepaint(_TargetPainter oldDelegate) => oldDelegate.level != level;
 }
-
