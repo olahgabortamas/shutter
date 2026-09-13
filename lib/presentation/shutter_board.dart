@@ -82,6 +82,7 @@ class _ShutterBoardState extends State<ShutterBoard> with SingleTickerProviderSt
   }
 
   void _start(DragStartDetails details, Size size) {
+    if (widget.controller.solved) return;
     final index = _pickPlate(details.localPosition, size);
     _snapController.stop();
     setState(() {

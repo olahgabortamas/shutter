@@ -1,0 +1,32 @@
+{
+  "id": "campaign_0002",
+  "chapter": "aperture",
+  "number": 2,
+  "board": { "rows": 3, "columns": 3 },
+  "baseLights": [1, 1, 1, 1, 1, 1, 1, 1, 1],
+  "target": [1, 0, 0, 0, 1, 0, 0, 0, 1],
+  "plates": [
+    {
+      "id": "A",
+      "axis": "horizontal",
+      "notches": 3,
+      "start": 1,
+      "masks": [
+        [1, 1, 0, 0, 1, 1, 1, 0, 1],
+        [0, 1, 1, 1, 0, 1, 1, 1, 0],
+        [1, 0, 1, 1, 1, 0, 0, 1, 1]
+      ]
+    },
+    {
+      "id": "B",
+      "axis": "vertical",
+      "notches": 3,
+      "start": 2,
+      "masks": [
+        [1, 0, 1, 1, 1, 0, 0, 1, 1],
+        [1, 1, 0, 0, 1, 1, 1, 0, 1],
+        [0, 1, 1, 1, 0, 1, 1, 1, 0]
+      ]
+    }
+  ]
+}

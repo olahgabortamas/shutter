@@ -40,12 +40,15 @@ baseLights AND plateA[currentNotch] AND plateB[currentNotch] ...
 search. `ShutterBoard` owns temporary drag and snap-rendering state. This keeps
 offline generation, validation, and future solver ports independent from UI.
 
+The campaign is declared by `assets/levels/manifest.json`. CI enumerates every
+entry, checks level numbering and starting state, and exhaustively confirms that
+at least one solution exists before shipping it.
+
 ## Deferred work
 
-- additional campaign levels and progression persistence;
+- progression persistence and the remainder of the campaign;
 - onboarding, pause, and settings surfaces;
 - reduced-motion, sound, and haptic preferences;
 - mechanical audio;
 - locks, couplings, ratchets, spectrum, and sequence chapters;
 - analytics, crash reporting, ads, purchases, and remote content.
-

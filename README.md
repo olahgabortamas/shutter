@@ -5,11 +5,11 @@ their apertures reveal exactly the requested constellation of lights.
 
 This repository contains the first Flutter vertical slice:
 
-- immutable JSON-backed level definitions;
+- a five-level, JSON-backed Aperture campaign;
 - framework-independent mask logic and breadth-first hint solver;
 - drag-to-slide plates with discrete notch snapping and haptics;
 - a custom-painted ceramic, graphite, brass, and amber board;
-- undo, one-move hint, reset, and automatic completion recognition;
+- undo, one-move hint, reset, automatic completion, and level progression;
 - unit and widget tests.
 
 ## Run locally
@@ -42,7 +42,7 @@ keeps future level generation and validation straightforward.
 
 ## MVP scope
 
-The current build covers Chapter 1: Aperture. Locks, coupled mechanisms,
+The current build covers the first five mechanisms in Chapter 1: Aperture.
+Locks, coupled mechanisms,
 ratchets, spectrum filters, persistence, audio, monetization, and analytics are
 intentionally deferred until the core interaction has been play-tested.
-

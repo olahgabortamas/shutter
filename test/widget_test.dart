@@ -5,8 +5,7 @@ import 'package:shutter/domain/shutter_level.dart';
 import 'package:shutter/presentation/game_screen.dart';
 
 class _MemoryRepository implements LevelRepository {
-  @override
-  Future<ShutterLevel> load(int levelNumber) async => const ShutterLevel(
+  ShutterLevel get level => const ShutterLevel(
         id: 'test',
         chapter: 'aperture',
         number: 1,
@@ -26,6 +25,12 @@ class _MemoryRepository implements LevelRepository {
           ),
         ],
       );
+
+  @override
+  Future<ShutterLevel> load(int levelNumber) async => level;
+
+  @override
+  Future<List<ShutterLevel>> loadCampaign() async => [level];
 }
 
 void main() {
