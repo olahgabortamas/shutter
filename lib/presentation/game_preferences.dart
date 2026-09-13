@@ -53,10 +53,19 @@ class GamePreferences extends ChangeNotifier {
     int currentLevelIndex = 0,
     bool hapticsEnabled = true,
     bool reducedMotion = false,
-  })  : _store = store,
-        _currentLevelIndex = currentLevelIndex,
-        _hapticsEnabled = hapticsEnabled,
-        _reducedMotion = reducedMotion;
+  }) : this._(
+          store,
+          currentLevelIndex,
+          hapticsEnabled,
+          reducedMotion,
+        );
+
+  GamePreferences._(
+    this._store,
+    this._currentLevelIndex,
+    this._hapticsEnabled,
+    this._reducedMotion,
+  );
 
   static Future<GamePreferences> load({GamePreferencesStore? store}) async {
     final resolvedStore = store ?? SharedPreferencesGameStore();
